@@ -1,24 +1,18 @@
-import features.FeatureExtractor;
-import features.FormulaParser;
-import java.util.Map;
+import data.DatasetLoader;
+import java.util.List;
+import materials.Material;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        String formula = "Fe2O3";
+        List<Material> materials = DatasetLoader.load("data/materials.csv");
 
-        Map<String, Double> composition = FormulaParser.parse(formula);
+        System.out.println("Loaded materials: " + materials.size());
 
-        double avgZ = FeatureExtractor.averageAtomicNumber(composition);
-        double avgMass = FeatureExtractor.averageAtomicMass(composition);
-        double avgEN = FeatureExtractor.averageElectronegativity(composition);
+        for (Material m : materials) {
+            System.out.println(m.getFormula() + " density=" + m.getDensity());
+        }
 
-        System.out.println("Formula: " + formula);
-        System.out.println("Composition: " + composition);
-
-        System.out.println("Average atomic number: " + avgZ);
-        System.out.println("Average atomic mass: " + avgMass);
-        System.out.println("Average electronegativity: " + avgEN);
     }
 }
