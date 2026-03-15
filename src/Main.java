@@ -10,11 +10,15 @@ public class Main {
 
         Map<String, Double> composition = FormulaParser.parse(formula);
 
-        double avgAtomicNumber = FeatureExtractor.averageAtomicNumber(composition);
+        double avgZ = FeatureExtractor.averageAtomicNumber(composition);
+        double avgMass = FeatureExtractor.averageAtomicMass(composition);
+        double avgEN = FeatureExtractor.averageElectronegativity(composition);
 
         System.out.println("Formula: " + formula);
         System.out.println("Composition: " + composition);
-        System.out.println("Average atomic number: " + avgAtomicNumber);
 
+        System.out.println("Average atomic number: " + avgZ);
+        System.out.println("Average atomic mass: " + avgMass);
+        System.out.println("Average electronegativity: " + avgEN);
     }
 }
