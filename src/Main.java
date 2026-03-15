@@ -1,6 +1,6 @@
+import features.FeatureExtractor;
 import features.FormulaParser;
 import java.util.Map;
-import materials.Material;
 
 public class Main {
 
@@ -10,10 +10,11 @@ public class Main {
 
         Map<String, Double> composition = FormulaParser.parse(formula);
 
-        Material material = new Material(formula, composition);
+        double avgAtomicNumber = FeatureExtractor.averageAtomicNumber(composition);
 
         System.out.println("Formula: " + formula);
         System.out.println("Composition: " + composition);
+        System.out.println("Average atomic number: " + avgAtomicNumber);
 
     }
 }
