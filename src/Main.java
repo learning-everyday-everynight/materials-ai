@@ -2,6 +2,7 @@ import data.DatasetLoader;
 import java.util.List;
 import materials.Material;
 import ml.FeatureDatasetBuilder;
+import ml.LinearRegressionModel;
 
 public class Main {
 
@@ -12,15 +13,19 @@ public class Main {
         double[][] X = FeatureDatasetBuilder.buildFeatures(materials);
         double[] y = FeatureDatasetBuilder.buildTargetDensity(materials);
 
-        System.out.println("Dataset size: " + materials.size());
+        LinearRegressionModel model = new LinearRegressionModel(3);
 
-        for (int i = 0; i < materials.size(); i++) {
+        model.train(X, y, 0.00001, 1000);
+
+        System.out.println("Predictions:");
+
+        for (int i = 0; i < X.length; i++) {
+
+            double predicted = model.predict(X[i]);
 
             System.out.println(
-                    X[i][0] + " " +
-                    X[i][1] + " " +
-                    X[i][2] +
-                    " -> density=" + y[i]
+                    "Real: " + y[i] +
+                    " Predicted: " + predicted
             );
         }
 
