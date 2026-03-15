@@ -1,6 +1,7 @@
 import data.DatasetLoader;
 import java.util.List;
 import materials.Material;
+import ml.FeatureDatasetBuilder;
 
 public class Main {
 
@@ -8,10 +9,19 @@ public class Main {
 
         List<Material> materials = DatasetLoader.load("data/materials.csv");
 
-        System.out.println("Loaded materials: " + materials.size());
+        double[][] X = FeatureDatasetBuilder.buildFeatures(materials);
+        double[] y = FeatureDatasetBuilder.buildTargetDensity(materials);
 
-        for (Material m : materials) {
-            System.out.println(m.getFormula() + " density=" + m.getDensity());
+        System.out.println("Dataset size: " + materials.size());
+
+        for (int i = 0; i < materials.size(); i++) {
+
+            System.out.println(
+                    X[i][0] + " " +
+                    X[i][1] + " " +
+                    X[i][2] +
+                    " -> density=" + y[i]
+            );
         }
 
     }
