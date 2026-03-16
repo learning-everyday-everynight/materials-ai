@@ -41,4 +41,13 @@ public class LinearRegressionModel {
 
         return result;
     }
+
+
+    public void printWeights() {
+    System.out.println("Weights:");
+    for (double w : weights) {
+        System.out.println(w);
+    }
+    System.out.println("Bias: " + bias);
+}
 }

@@ -1,22 +1,34 @@
 import data.DatasetLoader;
+import features.FeatureExtractor;
+import features.FormulaParser;
 import java.util.List;
+import java.util.Map;
 import materials.Material;
-import ml.*;
+import ml.FeatureDatasetBuilder;
+import ml.FeatureScaler;
+import ml.LinearRegressionModel;
+import ml.Metrics;
+import ml.TrainTestSplit;
 
 public class Main {
 
     public static void main(String[] args) {
 
+        // 1. Load dataset
         List<Material> materials = DatasetLoader.load("data/materials.csv");
 
+        // 2. Build feature matrix
         double[][] X = FeatureDatasetBuilder.buildFeatures(materials);
+
+        // 3. Normalize features
+        FeatureScaler.normalize(X);
+
+        // 4. Target values
         double[] y = FeatureDatasetBuilder.buildTargetDensity(materials);
 
+        // 5. Train/test split
         int split = TrainTestSplit.splitIndex(materials.size(), 0.8);
 
-        LinearRegressionModel model = new LinearRegressionModel(3);
-
-        // TRAIN
         double[][] Xtrain = new double[split][3];
         double[] ytrain = new double[split];
 
@@ -25,9 +37,13 @@ public class Main {
             ytrain[i] = y[i];
         }
 
-        model.train(Xtrain, ytrain, 0.00001, 1000);
+        // 6. Train model
+        LinearRegressionModel model = new LinearRegressionModel(3);
+        model.train(Xtrain, ytrain, 0.0001, 30000);
 
-        // TEST
+        model.printWeights();
+
+        // 7. Test model
         double[] predictions = new double[materials.size() - split];
         double[] ytest = new double[materials.size() - split];
 
@@ -50,20 +66,49 @@ public class Main {
 
         System.out.println("MAE error: " + mae);
 
-
+        // 8. Predict new material
 
         String newMaterial = "TiO2";
 
-        var composition = features.FormulaParser.parse(newMaterial);
+        Map<String, Double> composition = FormulaParser.parse(newMaterial);
 
         double[] newFeatures = new double[3];
 
-        newFeatures[0] = features.FeatureExtractor.averageAtomicNumber(composition);
-        newFeatures[1] = features.FeatureExtractor.averageAtomicMass(composition);
-        newFeatures[2] = features.FeatureExtractor.averageElectronegativity(composition);
+        newFeatures[0] = FeatureExtractor.averageAtomicNumber(composition);
+        newFeatures[1] = FeatureExtractor.averageAtomicMass(composition);
+        newFeatures[2] = FeatureExtractor.averageElectronegativity(composition);
+
+        // normalize new material
+        FeatureScaler.normalizeVector(newFeatures);
 
         double predictedDensity = model.predict(newFeatures);
 
-        System.out.println("Prediction for " + newMaterial + ": " + predictedDensity);
+        System.out.println(
+                "Prediction density for " +
+                newMaterial +
+                ": " +
+                predictedDensity
+        );
+
+
+
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+
+        System.out.println("Enter material formula:");
+        String inputFormula = scanner.nextLine();
+
+        Map<String, Double> newComposition = FormulaParser.parse(inputFormula);
+
+        double[] inputFeatures = new double[3];
+
+        inputFeatures[0] = FeatureExtractor.averageAtomicNumber(newComposition);
+        inputFeatures[1] = FeatureExtractor.averageAtomicMass(newComposition);
+        inputFeatures[2] = FeatureExtractor.averageElectronegativity(newComposition);
+
+        FeatureScaler.normalizeVector(inputFeatures);
+
+        double prediction = model.predict(inputFeatures);
+
+        System.out.println("Predicted density: " + prediction);
     }
 }
